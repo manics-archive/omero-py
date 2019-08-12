@@ -37,10 +37,16 @@ import os
 
 from setuptools import setup, find_packages
 
-from StringIO import StringIO
+try:
+    from io import BytesIO
+except ImportError:
+    from StringIO import StringIO as BytesIO
 from hashlib import md5
 from shutil import copy
-from urllib import urlopen
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib import urlopen
 from zipfile import ZipFile
 
 blitz_zip = "https://artifacts.openmicroscopy.org/artifactory/ome.releases/org/openmicroscopy/omero-blitz/5.5.3/omero-blitz-5.5.3-python.zip"
@@ -51,7 +57,7 @@ if not os.path.exists("target"):
     content = resp.read()
     md5 = md5(content).hexdigest()
     assert md5 == blitz_md5
-    zipfile = ZipFile(StringIO(content))
+    zipfile = ZipFile(BytesIO(content))
     zipfile.extractall("target")
 
     for dirpath, dirs, files in os.walk("src"):

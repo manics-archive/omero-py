@@ -74,7 +74,7 @@ class PyTest(TestCommand):
             self.test_args.extend(['--junitxml', self.junitxml])
         if self.pdb:
             self.test_args.extend(['--pdb'])
-        print self.test_failfast
+        print(self.test_failfast)
         self.test_suite = True
         if self.markers:
             self.test_args = "--markers"
