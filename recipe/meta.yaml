@@ -1,0 +1,53 @@
+{% set data = load_setup_py_data(setup_file='../setup.py', from_recipe_dir=True) %}
+
+package:
+  name: "{{ data.get('name')|lower }}"
+  version: "{{ data.get('version') }}"
+
+source:
+  path: ../
+
+build:
+  number: 0
+  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv "
+
+requirements:
+  host:
+    - pip
+    - python
+  run:
+    - python
+    - zeroc-ice >=3.6.4,<3.7
+
+test:
+  imports:
+    - omero
+    - omero.api
+    - omero.clients
+    - omero.cmd
+    - omero.constants
+    - omero.fs
+    - omero.gateway
+    - omero.grid
+    - omero.install
+    - omero.metadatastore
+    - omero.model
+    - omero.plugins
+    - omero.romio
+    - omero.sys
+    # - omero.testlib
+    - omero.util
+    - omero_ext
+  commands:
+    - omero --help
+
+about:
+  home: https://www.openmicroscopy.org/
+  license: GNU General Public v2 (GPLv2)
+  license_family: GPL2
+  summary: Python bindings to the OMERO.blitz server
+  doc_url: https://docs.openmicroscopy.org/latest/omero/developers
+
+extra:
+  recipe-maintainers:
+    - ome
