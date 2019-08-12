@@ -8,15 +8,16 @@ source:
   path: ../
 
 build:
+  noarch: python
   number: 0
   script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv "
 
 requirements:
   host:
     - pip
-    - python
+    - python =2.7
   run:
-    - python
+    - python =2.7
     - zeroc-ice >=3.6.4,<3.7
 
 test:
