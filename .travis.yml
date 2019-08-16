@@ -37,8 +37,8 @@ deploy:
     script: anaconda -t $CONDA_UPLOAD_TOKEN upload $HOME/miniconda/conda-bld/$TRAVIS_OS_NAME-64/$PACKAGE_NAME-*.tar.bz2 --force -l "${TRAVIS_BRANCH}"
     env:
       - PLATFORM=miniconda
-    # on:
-    #   branch: master
+    on:
+      all_branches: true
 
   # Anaconda release
   - provider: script
