@@ -2,7 +2,7 @@
 
 package:
   name: "{{ data.get('name')|lower }}"
-  version: "{{ data.get('version') }}"
+  version: "{{ data.get('version') }}{{ environ.get('VERSION_SUFFIX', '') }}"
 
 source:
   path: ../
@@ -11,6 +11,8 @@ build:
   noarch: python
   number: 0
   script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv "
+  script_env:
+    - VERSION_SUFFIX
 
 requirements:
   host:
