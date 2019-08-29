@@ -5,11 +5,16 @@ language: python
 python:
   - "2.7"
 
-services:
-  - docker
+before_install:
+  - sudo apt-get install -y openssl
+  - pip install "zeroc-ice>3.6.4,<3.7"
+  - python -c "import Ice; print Ice.stringVersion()"
 
 script:
-  - docker build -t omero-py .
+  - python setup.py sdist
+  - pip install dist/omero-py*gz
+  - python -c "import omero_version; print omero_version.omero_version"
+  - omero version
 
 deploy:
   provider: pypi
