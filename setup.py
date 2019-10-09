@@ -106,7 +106,10 @@ def _relative_symlink(src, dst):
         os.symlink(relsrc, dst)
 
 
-def copy_src_to_target(symlink=False):
+def copy_src_to_target():
+    """
+    Recursively copy files from src/ to target/
+    """
     for dirpath, dirs, files in os.walk("src"):
         for filename in files:
             topath = dirpath.replace("src", "target", 1)
@@ -114,10 +117,35 @@ def copy_src_to_target(symlink=False):
                 os.makedirs(topath)
             fromfile = os.path.sep.join([dirpath, filename])
             tofile = os.path.sep.join([topath, filename])
-            if symlink:
-                _relative_symlink(fromfile, tofile)
-            else:
-                copy(fromfile, tofile)
+            copy(fromfile, tofile)
+
+
+def _is_subpath(parents, p):
+    for parent in parents:
+        if os.path.commonpath([parent, p]) == parent:
+            return True
+    return False
+
+
+def symlink_src_to_target():
+    """
+    Symlink packages from src/ to target/ if corresponding target subdirectory
+    is empty, othtewise symlink files
+    """
+    symlinked_dirs = []
+    for dirpath, dirs, files in os.walk("src"):
+        if _is_subpath(symlinked_dirs, dirpath):
+            continue
+        for filename in files:
+            topath = dirpath.replace("src", "target", 1)
+            if not os.path.exists(topath):
+                _relative_symlink(dirpath, topath)
+                symlinked_dirs.append(dirpath)
+                # Symlinked the parent dir so don't need to symlink files
+                break
+            fromfile = os.path.sep.join([dirpath, filename])
+            tofile = os.path.sep.join([topath, filename])
+            _relative_symlink(fromfile, tofile)
 
 
 # https://coderwall.com/p/3q_czg/custom-subcommand-at-setup-py
@@ -148,7 +176,7 @@ class DevTargetCommand(Command):
     def run(self):
         rmtree('target')
         download_blitz_target()
-        copy_src_to_target(symlink=True)
+        symlink_src_to_target()
         print("If this is installed as an editable module re-run "
               "`pip install -e .`")
 
