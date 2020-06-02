@@ -45,3 +45,7 @@ install: pip3 install --upgrade pip wheel pytest tox
 cache:
   directories:
   - $HOME/.cache/pip
+
+after_failure:
+  - ls /home/travis/build/*/omero-py/.tox/*/log/*.log
+  - cat /home/travis/build/*/omero-py/.tox/*/log/*.log
