@@ -27,6 +27,7 @@ jobs:
       python: "3.6"
       script:
         - ulimit -n 4096
+        - pip install -U pip
         - tox -e py36
     - stage: deploy
       python: "3.6"
