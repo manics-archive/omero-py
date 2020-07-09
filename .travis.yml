@@ -43,6 +43,8 @@ jobs:
 
     - stage: deploy
       python: "3.6"
+      if: tag IS present
+      install: skip
       script: skip
       skip_cleanup: true
       deploy:
