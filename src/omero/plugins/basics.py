@@ -21,10 +21,12 @@ from __future__ import print_function
 
 from past.builtins import cmp
 from glob import glob
+from shlex import quote
 import sys
 
 from collections import defaultdict
 
+from omero_ext.argparse import PARSER
 from omero.cli import BaseControl
 from omero.cli import CLI
 from omero.cli import VERSION
@@ -127,6 +129,13 @@ class ShellControl(BaseControl):
         parser.add_argument(
             "--login", action="store_true",
             help="Logins in and sets the 'client' variable")
+
+        parser.add_argument("--run", nargs=PARSER, help=(
+            "Run a Python script and pass all arguments to script instead "
+            "of IPython. Exit afterwards."))
+        parser.add_argument("--runi", nargs=PARSER, help=(
+            "Run a Python script and pass all arguments to script instead "
+            "of IPython. Remain in IPython shell afterwards."))
         parser.add_argument("arg", nargs="*", help="Arguments for IPython.")
         parser.set_defaults(func=self.__call__)
 
@@ -150,8 +159,25 @@ class ShellControl(BaseControl):
 
         try:
             # IPython 0.11 (see #7112)
-            from IPython import embed
-            embed(user_ns=ns)
+            runargs = args.runi
+            code_to_run = None
+            if args.run:
+                runargs = args.run
+                code_to_run = 'quit'
+            if runargs:
+                # http://stackoverflow.com/a/27914204
+                from IPython import start_ipython
+                from traitlets.config import Config
+                c = Config()
+                c.InteractiveShellApp.exec_lines = [
+                    '%run -G -i ' + ' '.join(quote(a) for a in runargs),
+                ]
+                if not args.runi:
+                    c.InteractiveShellApp.code_to_run = 'quit'
+                start_ipython(argv=[], user_ns=ns, config=c)
+            else:
+                from IPython import embed
+                embed(user_ns=ns)
         except ImportError:
             from IPython.Shell import IPShellEmbed
             ipshell = IPShellEmbed(args.arg)
