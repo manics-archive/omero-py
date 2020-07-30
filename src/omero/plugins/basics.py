@@ -131,8 +131,6 @@ class ShellControl(BaseControl):
             "--login", action="store_true",
             help="Logins in and sets the 'client' variable")
 
-        parser.add_argument("--run", nargs=PARSER, help=(
-            "Run a Python script, passing all arguments."))
         parser.add_argument("--runi", nargs=PARSER, help=(
             "Run a Python script in an IPython shell, passing all arguments. "
             "Remain in the IPython shell afterwards."))
@@ -159,21 +157,14 @@ class ShellControl(BaseControl):
 
         try:
             # IPython 0.11 (see #7112)
-            runargs = args.runi
-            code_to_run = None
-            if args.run:
-                r = subprocess.run([sys.executable] + args.run)
-                sys.exit(r.returncode)
-            elif args.runi:
+            if args.runi:
                 # http://stackoverflow.com/a/27914204
                 from IPython import start_ipython
                 from traitlets.config import Config
                 c = Config()
                 c.InteractiveShellApp.exec_lines = [
-                    '%run -G -i ' + ' '.join(quote(a) for a in runargs),
+                    '%run -G -i ' + ' '.join(quote(a) for a in args.runi),
                 ]
-                if not args.runi:
-                    c.InteractiveShellApp.code_to_run = 'quit'
                 start_ipython(argv=[], user_ns=ns, config=c)
             else:
                 from IPython import embed
