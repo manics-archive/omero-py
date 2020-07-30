@@ -156,7 +156,6 @@ class ShellControl(BaseControl):
             ns = {"client": client, "omero": omero}
 
         try:
-            # IPython 0.11 (see #7112)
             if args.runi:
                 # http://stackoverflow.com/a/27914204
                 from IPython import start_ipython
@@ -170,9 +169,7 @@ class ShellControl(BaseControl):
                 from IPython import embed
                 embed(user_ns=ns)
         except ImportError:
-            from IPython.Shell import IPShellEmbed
-            ipshell = IPShellEmbed(args.arg)
-            ipshell(local_ns=ns)
+            self.ctx.die(105, "ERROR: IPython is not installed")
 
 HELP_USAGE = """usage: %(program_name)s <command> [options] args
 See 'help <command>' or '<command> -h' for more information on syntax
