@@ -22,6 +22,7 @@ from __future__ import print_function
 from past.builtins import cmp
 from glob import glob
 from shlex import quote
+import subprocess
 import sys
 
 from collections import defaultdict
@@ -131,11 +132,10 @@ class ShellControl(BaseControl):
             help="Logins in and sets the 'client' variable")
 
         parser.add_argument("--run", nargs=PARSER, help=(
-            "Run a Python script and pass all arguments to script instead "
-            "of IPython. Exit afterwards."))
+            "Run a Python script, passing all arguments."))
         parser.add_argument("--runi", nargs=PARSER, help=(
-            "Run a Python script and pass all arguments to script instead "
-            "of IPython. Remain in IPython shell afterwards."))
+            "Run a Python script in an IPython shell, passing all arguments. "
+            "Remain in the IPython shell afterwards."))
         parser.add_argument("arg", nargs="*", help="Arguments for IPython.")
         parser.set_defaults(func=self.__call__)
 
@@ -162,9 +162,9 @@ class ShellControl(BaseControl):
             runargs = args.runi
             code_to_run = None
             if args.run:
-                runargs = args.run
-                code_to_run = 'quit'
-            if runargs:
+                r = subprocess.run([sys.executable] + args.run)
+                sys.exit(r.returncode)
+            elif args.runi:
                 # http://stackoverflow.com/a/27914204
                 from IPython import start_ipython
                 from traitlets.config import Config
